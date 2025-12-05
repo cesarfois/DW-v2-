@@ -13,6 +13,26 @@ export const docuwareService = {
         return response.data.Fields || [];
     },
 
+    // 2.5 Get Cabinet Document Count
+    getCabinetCount: async (cabinetId) => {
+        try {
+            const response = await api.get(`/FileCabinets/${cabinetId}/Documents`, {
+                params: {
+                    count: 0,
+                    calculateTotalCount: true
+                }
+            });
+
+            if (typeof response.data.Count === 'object' && response.data.Count !== null) {
+                return response.data.Count.Value || 0;
+            }
+            return response.data.Count || 0;
+        } catch (error) {
+            console.error('Error getting cabinet count:', error);
+            return 0;
+        }
+    },
+
     // 3. Get Dialogs for a Cabinet
     getDialogs: async (cabinetId) => {
         const response = await api.get(`/FileCabinets/${cabinetId}/Dialogs`);

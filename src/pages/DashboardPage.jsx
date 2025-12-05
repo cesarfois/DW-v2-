@@ -9,6 +9,7 @@ import { docuwareService } from '../services/docuwareService';
 const DashboardPage = () => {
     const [results, setResults] = useState([]);
     const [totalDocs, setTotalDocs] = useState(0);
+    const [totalCount, setTotalCount] = useState(0);
     const [logs, setLogs] = useState([]);
     const [cabinetId, setCabinetId] = useState('');
 
@@ -17,9 +18,32 @@ const DashboardPage = () => {
         setLogs((prev) => [...prev, `[${timestamp}] ${message}`]);
     };
 
-    const handleSearch = async (selectedCabinetId, filters) => {
+    const handleCabinetSelect = async (selectedCabinetId) => {
         try {
             setCabinetId(selectedCabinetId);
+            setResults([]); // Clear previous results
+            setTotalDocs(0);
+
+            if (selectedCabinetId) {
+                addLog(`Cabinet selected: ${selectedCabinetId}. Fetching total count...`);
+                const count = await docuwareService.getCabinetCount(selectedCabinetId);
+                setTotalCount(count);
+                addLog(`Total documents in cabinet: ${count}`);
+            } else {
+                setTotalCount(0);
+            }
+        } catch (error) {
+            console.error('Error fetching cabinet count:', error);
+            addLog(`❌ Error fetching total count: ${error.message}`);
+        }
+    };
+
+    const handleSearch = async (selectedCabinetId, filters) => {
+        try {
+            // Note: cabinetId state might arguably be set here too, or relying on handleCabinetSelect
+            if (selectedCabinetId !== cabinetId) {
+                setCabinetId(selectedCabinetId);
+            }
             addLog(`Searching cabinet ${selectedCabinetId} with ${filters.length} filter(s)...`);
 
             if (filters.length > 0) {
@@ -46,7 +70,12 @@ const DashboardPage = () => {
                 <h1 className="text-3xl font-bold mb-6">DocuWare Dashboard</h1>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-                    <SearchForm onSearch={handleSearch} onLog={addLog} />
+                    <SearchForm
+                        onSearch={handleSearch}
+                        onLog={addLog}
+                        totalCount={totalCount}
+                        onCabinetChange={handleCabinetSelect}
+                    />
                     <LogConsole logs={logs} />
                 </div>
 

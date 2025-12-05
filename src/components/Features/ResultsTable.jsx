@@ -362,9 +362,12 @@ const ResultsTable = ({ results, totalDocs, cabinetId }) => {
             <div className="card-body">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="card-title">
-                        Search Results ({filteredResults.length} of {results.length} documents)
+                        Search Results: <span className="text-primary">{totalDocs} Found</span>
+                        <span className="text-sm font-normal text-gray-500 ml-2">
+                            (Showing {filteredResults.length} items)
+                        </span>
                         {activeFiltersCount > 0 && (
-                            <span className="badge badge-primary badge-sm">{activeFiltersCount} filters</span>
+                            <span className="badge badge-primary badge-sm ml-2">{activeFiltersCount} filters</span>
                         )}
                     </h2>
 

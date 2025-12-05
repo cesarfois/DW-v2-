@@ -3,7 +3,7 @@ import { docuwareService } from '../../services/docuwareService';
 import LoadingSpinner from '../Common/LoadingSpinner';
 import ErrorMessage from '../Common/ErrorMessage';
 
-const SearchForm = ({ onSearch, onLog }) => {
+const SearchForm = ({ onSearch, onLog, totalCount = 0, onCabinetChange }) => {
     const [cabinets, setCabinets] = useState([]);
     const [selectedCabinet, setSelectedCabinet] = useState('');
     const [fields, setFields] = useState([]);
@@ -97,7 +97,13 @@ const SearchForm = ({ onSearch, onLog }) => {
                     <select
                         className="select select-bordered w-full"
                         value={selectedCabinet}
-                        onChange={(e) => setSelectedCabinet(e.target.value)}
+                        onChange={(e) => {
+                            const newValue = e.target.value;
+                            setSelectedCabinet(newValue);
+                            if (onCabinetChange) {
+                                onCabinetChange(newValue);
+                            }
+                        }}
                     >
                         <option value="">Select a cabinet...</option>
                         {cabinets.map((cab) => (
@@ -107,6 +113,14 @@ const SearchForm = ({ onSearch, onLog }) => {
                         ))}
                     </select>
                 </div>
+
+                {/* Total Count Display */}
+                {selectedCabinet && (
+                    <div className="alert alert-info py-2 mt-2 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>Total Documents in Cabinet: <span className="font-bold">{totalCount}</span></span>
+                    </div>
+                )}
 
                 {/* Filters */}
                 {selectedCabinet && fields.length > 0 && (
